@@ -24,6 +24,20 @@ const context = {
     return this.response.body = val
   }
 }
+const compose = function (middlewares = []) {
+  return function (ctx) {
+    return dispatch(0)
+    function dispatch(index) {
+      let fn = middlewares[index]
+      if (!fn) {
+        return Promise.resolve()
+      }
+      return Promise.resolve(fn(ctx, function next() {
+        return dispatch(index + 1)
+      }))
+    }
+  }  
+}
 
 module.exports = class Application {
   constructor() {
@@ -38,14 +52,16 @@ module.exports = class Application {
     return this
   }
   callback() {
-    const handleRequest = (req, res) => {
+    const handleRequest = async (req, res) => {
       const ctx = this.createContext(req, res)
       // console.log('ctx', ctx)
-      for (var i = 0; i < this.middleware.length; i++) {
-        // console.log('index', i)
-        this.middleware[i](ctx)
-      }
-      res.end(ctx.body)
+      // for (var i = 0; i < this.middleware.length; i++) {
+      //   // console.log('index', i)
+      //   await this.middleware[i](ctx)
+      // }
+      const fn = compose(this.middleware)
+      await fn(ctx)
+      ctx.res.end(ctx.body) 
     }
     return handleRequest
   }
