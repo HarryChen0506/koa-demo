@@ -9,12 +9,12 @@ app.use((ctx) => {
 })
 app.use((ctx) => {
   const {req, res} = ctx
-  console.log('req.url', req.url)
-  res.writeHead(200, {
-    'Content-Type': 'text/html'
-  })
-  res.write('hello harry --')
-  res.end()
+  console.log('ctx.url', ctx.url)
+  // res.writeHead(200, {
+  //   'Content-Type': 'text/html'
+  // })
+  // res.write('hello harry --')
+  ctx.body = '1234' + ctx.url  
 })
 app.listen(3001, () => {
   console.log('listen on 3001')

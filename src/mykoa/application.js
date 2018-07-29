@@ -1,13 +1,37 @@
 // 自己的koa
 const http = require('http')
+const request = {
+  get url() {
+    return this.req.url
+  }
+}
+const response = {
+  get body() {
+    return this._body
+  },
+  set body(val) {
+    return this._body = val
+  }
+}
+const context = {
+  get url() {
+    return this.request.url
+  },
+  get body() {
+    return this.response.body
+  },
+  set body(val) {
+    return this.response.body = val
+  }
+}
 
 module.exports = class Application {
   constructor() {
     this.name = 'myKoa';
-    this.middleware = [];
-    this.context = Object.create(null);
-    this.request = Object.create(null);
-    this.response = Object.create(null);
+    this.middleware = [];    
+    this.request = Object.create(request);
+    this.response = Object.create(response);
+    this.context = Object.create(context);
   }
   use(fn) {
     this.middleware.push(fn);
@@ -21,6 +45,7 @@ module.exports = class Application {
         // console.log('index', i)
         this.middleware[i](ctx)
       }
+      res.end(ctx.body)
     }
     return handleRequest
   }
